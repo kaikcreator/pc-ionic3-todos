@@ -32,8 +32,7 @@ export class AddTaskModalPage {
   }
 
   submit(){
-    console.log("model submited: ", this.model);
-    this.viewCtrl.dismiss();
+    this.viewCtrl.dismiss(this.model);
   }
 
 }
