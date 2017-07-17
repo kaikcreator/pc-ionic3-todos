@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams, ModalController } from 'ionic-angular';
 import { TodoModel } from "../../shared/todo.model";
 import { AddTaskModalPage } from "../add-task-modal/add-task-modal";
+import { TodoServiceProvider } from "../../providers/todo-service/todo-service";
 
 /**
  * Generated class for the TodosPage page.
@@ -16,33 +17,15 @@ import { AddTaskModalPage } from "../add-task-modal/add-task-modal";
 })
 export class TodosPage {
 
-  public todos:any[];
-
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
-  public modalCtrl: ModalController) {
+    public modalCtrl: ModalController,
+    public todoService: TodoServiceProvider) {
   }
 
   ionViewDidLoad() {
-    this.todos = [
-      new TodoModel("1 description"),
-      new TodoModel("2 description"),
-      new TodoModel("3 description"),
-      new TodoModel("4 description"),
-      new TodoModel("5 description"),
-      new TodoModel("6 description", true),
-      new TodoModel("7 description"),
-      new TodoModel("8 description", true),
-      new TodoModel("9 description"),
-      new TodoModel("10 description"),
-      new TodoModel("11 description", false, true),
-      new TodoModel("12 description"),
-      new TodoModel("13 description", true, true),
-      new TodoModel("14 description"),
-      new TodoModel("15 description"),
-      new TodoModel("16 description")
-    ]
+    
   }
 
   setTodoStyles(todo:TodoModel){
@@ -55,11 +38,7 @@ export class TodosPage {
   }
 
   toogleTodo(todo:TodoModel){
-    todo.isDone = ! todo.isDone;
-  }
-
-  addTodo(todo:TodoModel){
-    this.todos.push(todo);
+    this.todoService.toogleTodo(todo);
   }
 
   showAddTodo(){
@@ -68,7 +47,22 @@ export class TodosPage {
 
     modal.onDidDismiss((data)=>{
       if(data){
-        this.addTodo(data);
+        this.todoService.addTodo(data);
+      }
+    });
+  }
+
+  removeTodo(todo:TodoModel){
+    this.todoService.removeTodo(todo);
+  }
+
+  showEditTodo(todo:TodoModel){
+    let modal = this.modalCtrl.create(AddTaskModalPage, {todo});
+    modal.present();
+
+    modal.onDidDismiss(data=>{
+      if(data){
+        this.todoService.updateTodo(todo, data);
       }
     });
   }

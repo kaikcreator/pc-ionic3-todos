@@ -16,11 +16,18 @@ import { TodoModel } from "../../shared/todo.model";
 export class AddTaskModalPage {
 
   public model:TodoModel = new TodoModel('');
+  public title:string = "Add new task";
+  public buttonText:string = "ADD";
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
-    public viewCtrl: ViewController) {
+    public viewCtrl: ViewController){
+      if(this.navParams.get('todo')){
+        this.model = TodoModel.clone(this.navParams.get('todo'));
+        this.title = "Edit task";
+        this.buttonText = "SAVE CHANGES";
+      }
   }
 
   ionViewDidLoad() {
