@@ -6,7 +6,7 @@
 -->
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Add new task</ion-title>
+    <ion-title>{{title}}</ion-title>
     <ion-buttons start>
       <button ion-button (click)="dismiss()">
         <span color="secondary" showWhen="ios">Cancel</span>
@@ -17,20 +17,30 @@
 </ion-header>
 
 
-<ion-content padding>
-  <ion-list>
-    <ion-item>
-      <ion-input placeholder="task description" clearInput
-      [(ngModel)]="model.description"></ion-input>
-    </ion-item>
+<ion-content>
+  <ion-list no-lines>
+    <form class="container" (ngSubmit)="submit()">
+      <ion-item>
+        <ion-input placeholder="task description" clearInput required
+        [(ngModel)]="model.description" name="description"
+        #descriptionState="ngModel"></ion-input>
+      </ion-item>
 
-    <ion-item>
-      <ion-label>Is important</ion-label>
-      <ion-checkbox color="dark" [(ngModel)]="model.isImportant"></ion-checkbox>
-    </ion-item>
+      <ion-item color="danger"
+        [hidden]="descriptionState.valid || descriptionState.untouched">
+        Description is required
+      </ion-item>
 
-    <div>
-      <button ion-button block (click)="submit()">Add</button>
-    </div>
+      <ion-item>
+        <ion-label>Is important</ion-label>
+        <ion-checkbox name="isImportant"
+        color="dark" [(ngModel)]="model.isImportant"></ion-checkbox>
+      </ion-item>
+
+      <div class="submit-button">
+        <button [disabled]="!descriptionState.valid"
+        ion-button block type="submit">{{buttonText}}</button>
+      </div>
+    </form>
   </ion-list>
 </ion-content>

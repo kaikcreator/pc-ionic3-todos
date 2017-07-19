@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ModalController } from 'ionic-angular';
+import { NavController, NavParams, ModalController, Platform } from 'ionic-angular';
 import { TodoModel } from "../../shared/todo.model";
 import { AddTaskModalPage } from "../add-task-modal/add-task-modal";
+import { TodoServiceProvider } from "../../providers/todo-service/todo-service";
+import { ListModel } from "../../shared/list.model";
 
 /**
  * Generated class for the TodosPage page.
@@ -15,34 +17,24 @@ import { AddTaskModalPage } from "../add-task-modal/add-task-modal";
   templateUrl: 'todos.html',
 })
 export class TodosPage {
-
-  public todos:any[];
+  
+  private toogleTodoTimeout:any = null;
+  public list:ListModel;
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
-  public modalCtrl: ModalController) {
+    public modalCtrl: ModalController,
+    public todoService: TodoServiceProvider,
+    private platform: Platform) {
+      this.list = this.navParams.get('list');
+      this.todoService.loadFromList(this.list.id);
   }
 
-  ionViewDidLoad() {
-    this.todos = [
-      new TodoModel("1 description"),
-      new TodoModel("2 description"),
-      new TodoModel("3 description"),
-      new TodoModel("4 description"),
-      new TodoModel("5 description"),
-      new TodoModel("6 description", true),
-      new TodoModel("7 description"),
-      new TodoModel("8 description", true),
-      new TodoModel("9 description"),
-      new TodoModel("10 description"),
-      new TodoModel("11 description", false, true),
-      new TodoModel("12 description"),
-      new TodoModel("13 description", true, true),
-      new TodoModel("14 description"),
-      new TodoModel("15 description"),
-      new TodoModel("16 description")
-    ]
+  ionViewDidLoad() {  }
+
+  ionViewWillUnload(){
+    this.todoService.saveLocally(this.list.id);
   }
 
   setTodoStyles(todo:TodoModel){
@@ -55,12 +47,45 @@ export class TodosPage {
   }
 
   toogleTodo(todo:TodoModel){
-    todo.isDone = ! todo.isDone;
+    if(this.toogleTodoTimeout)
+      return;
+
+    this.toogleTodoTimeout = setTimeout(()=>{
+      this.todoService.toogleTodo(todo);
+      this.toogleTodoTimeout = null;
+    }, !this.platform.is("ios") ? 300 : 0);
+    
+  }
+
+  addTodo(todo:TodoModel){
+    this.todoService.addTodo(todo);
+  }
+
+  removeTodo(todo:TodoModel){
+    this.todoService.removeTodo(todo);
   }
 
   showAddTodo(){
     let modal = this.modalCtrl.create(AddTaskModalPage);
     modal.present();
+
+    modal.onDidDismiss(data=>{
+      if(data){
+        this.addTodo(data);
+      }
+    })
+  }
+
+  showEditTodo(todo:TodoModel){
+    let modal = this.modalCtrl.create(AddTaskModalPage, {todo});
+    modal.present();
+    modal.onDidDismiss(data=>{
+      if(data){
+        this.todoService.updateTodo(todo, data);
+      }
+    })
+
+
   }
 
 }

@@ -14,13 +14,19 @@ import { TodoModel } from "../../shared/todo.model";
   templateUrl: 'add-task-modal.html',
 })
 export class AddTaskModalPage {
-
+  public title:string = "Add new task";
+  public buttonText:string = "Add";
   public model:TodoModel = new TodoModel('');
 
   constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
     public viewCtrl: ViewController) {
+      if(this.navParams.get('todo')){
+        this.model = TodoModel.clone(this.navParams.get('todo'));
+        this.title = "Edit task";
+        this.buttonText = "Save Changes";
+      }
   }
 
   ionViewDidLoad() {
@@ -32,8 +38,7 @@ export class AddTaskModalPage {
   }
 
   submit(){
-    console.log("model submited: ", this.model);
-    this.viewCtrl.dismiss();
+    this.viewCtrl.dismiss(this.model);
   }
 
 }
